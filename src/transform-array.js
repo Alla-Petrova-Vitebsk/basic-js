@@ -13,49 +13,48 @@ import { NotImplementedError } from '../extensions/index.js';
  * transform([1, 2, 3, '--discard-prev', 4, 5]) => [1, 2, 4, 5]
  * 
  */
- export default function transform(arr) {
-    // throw new NotImplementedError('Not implemented');
-    
-function isContrl (str){
-  if (str != `--discard-next` && str != `--discard-prev` && str != `--double-next`&& str != '--double-prev') return str;
-}
-
-      if (Array.isArray(arr) != true)
-        throw new Error(`'arr' parameter must be an instance of the Array!`);
-      
-      let arrnew = [];
-      let flag = false;
-      let i = arr.indexOf(`--discard-next`);
-      
-      if (i != -1 && arr[i+1] != undefined) {
-        flag = true;
-        arrnew = arr.slice(0, i).concat(arr.slice(i + 2))
-        return arrnew;
-      };
-    
-      i = arr.indexOf(`--discard-prev`);
-      if (i != -1 && arr[i-1] != undefined) {
-        flag = true;
-        arrnew = arr.slice(0, i-1).concat(arr.slice(i + 1));
-        return arrnew;
-      };
-    
-      i = arr.indexOf(`--double-next`);
-      if (i != -1 && arr[i+1] != undefined) {
-        flag = true;
-        arrnew = arr.slice(0, i).concat(arr[i+1]).concat(arr.slice(i+1));
-        return arrnew;
-      };
-    
-      i = arr.indexOf('--double-prev');
-      if (i != -1 && arr[i-1] != undefined) {
-        flag = true;
-        arrnew = arr.slice(0, i).concat(arr[i-1]).concat(arr.slice(i+1));
-        return arrnew;
-      };
-
-    if (flag == false)   arrnew = arr.filter (isContrl);
-      
-      return arrnew;
-    }
- 
+export default function transform(arr) {
+  function isContrl(str) {
+    if (str != `--discard-next` && str != `--discard-prev` && str != `--double-next` && str != `--double-prev`) return str;
+  }
+  
+  if (Array.isArray(arr) != true)
+    throw new Error(`'arr' parameter must be an instance of the Array!`);
+  
+  let arrnew = [...arr];
+  let flag = false,
+    isdel = false;
+  
+  let i = arr.indexOf(`--discard-next`);
+  if (i != -1 && arr[i + 1] != undefined) {
+    flag = true;
+    isdel = true;
+    arrnew = arrnew.slice(0, i).concat(arrnew.slice(i + 2))
+   };
+   console.log(arrnew);
+  
+  i = arr.indexOf(`--discard-prev`);
+  if (i != -1 && arr[i - 1] != undefined && isdel == false) {
+    flag = true;
+    arrnew = arrnew.slice(0, i - 1).concat(arrnew.slice(i + 1));
+   };
+   console.log(arrnew);
+  
+  i = arr.indexOf(`--double-next`);
+  if (i != -1 && arr[i + 1] != undefined && isdel == false) {
+    flag = true;
+    arrnew = arrnew.slice(0, i).concat(arrnew[i + 1]).concat(arrnew.slice(i + 1));
+   };
+  console.log(arrnew);
+  
+  i = arr.indexOf(`--double-prev`);
+  if (i != -1 && arr[i - 1] != undefined && isdel == false) {
+    flag = true;
+    arrnew = arrnew.slice(0, i).concat(arrnew[i - 1]).concat(arrnew.slice(i + 1));
+   };
+   console.log(arrnew);
+  
+  if (flag == false)  arrnew = [...arr];
+  
+  return arrnew.filter(isContrl);
+  }
