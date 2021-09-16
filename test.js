@@ -1,53 +1,60 @@
 
-let chainMaker = {
-    chain: [],
+function transform(arr) {
 
-    getLength() {
-        return this.chain.length;
-    },
+    let isdel = false;
+    let arrnew = [...arr];
 
-    addLink(value) {
-        if (arguments.length === 0) this.chain.push(`( )`);
-        else this.chain.push(`( ${value} )`);
-        return this;
-    },
+    if (Array.isArray(arr) != true)
+        throw new Error(`'arr' parameter must be an instance of the Array!`);
 
-    removeLink(position ) {
-       if (typeof position !== 'number' ||  position > this.chain.length || position <= 0 || (position ^ 0) !== position ) {
-          
-        throw new Error (`You can't remove incorrect link!`);
-       }
-       this.chain.splice(position-1,1);
-       return this;
-    },
-
-    reverseChain() {
-        this.chain.reverse();
-        return this;
-    },
-
-    finishChain() {
-        let oldchain = this.chain.join('~~');
-        this.chain = [];
-        return oldchain;
+    function isContrl(str) {
+        if (str != `--discard-next` && str != `--discard-prev` && str != `--double-next` && str != `--double-prev`) return str;
     }
-};
 
+    function discardNext(arr, index) {
+        if (index !== -1 && arr[index + 1] !== undefined) {
+            isdel = true;
+            arrnew = arrnew.slice(0, index).concat(arrnew.slice(index + 2))
+        };
+        return arrnew;
+    }
 
-// console.log (chainMaker.getLength());
-//console.log(chainMaker.addLink('1'));
-//console.log(chainMaker.addLink());
-//console.log(chainMaker.addLink('3'));
-// console.log (chainMaker.getLength());
-//console.log(chainMaker.finishChain());
-//console.log(chainMaker.reverseChain());
-//console.log(chainMaker.finishChain());
-console.log(chainMaker.addLink(1).addLink(2).addLink(3).removeLink(4));
+    function discardPrev(arr, index) {
+        if (index !== -1 && arr[index - 1] !== undefined && isdel === false) {
+            arrnew = arrnew.slice(0, index - 1).concat(arrnew.slice(index + 1));
+        };
+        return arrnew;
+    }
 
-chainMaker.addLink(1);
-chainMaker.addLink(2);
-chainMaker.reverseChain();
-chainMaker.addLink(3);
-console.log(chainMaker.finishChain());
-chainMaker.removeLink(0);
-console.log(chainMaker.finishChain());
+    function doubleNext(arr, index) {
+        if (index !== -1 && arr[index + 1] !== undefined && isdel === false) {
+            let temp1 = arrnew[index + 1];
+            let temp2 = arrnew.slice(index + 1);  
+             arrnew = arrnew.slice(0, index).concat(temp1, temp2);
+        };
+        return arrnew;
+    }
+
+    function doublePrev(arr, index) {
+        if (index !== -1 && arr[index - 1] !== undefined && isdel === false) {
+           let temp1 = arrnew[index-1];
+           let temp2 = arrnew.slice(index + 1);
+           arrnew = arrnew.slice(0, index).concat(temp1,temp2);
+        };
+        return arrnew;
+    }
+
+    for (let i = 0; i < arrnew.length; i++) {
+        switch (arrnew[i]) {
+            case `--discard-next`: discardNext(arrnew, i); break;
+            case `--discard-prev`: discardPrev(arrnew, i); break;
+            case `--double-next`: doubleNext(arrnew, i); break;
+            case `--double-prev`: doublePrev(arrnew, i); break;        
+        }
+    }
+
+     return arrnew.filter(isContrl);
+}
+
+console.log (transform( [1, 2, 3, '--double-next', 1337, '--double-prev', 4, 5]));
+//console.log(transform([1, 2, 3, '--double-next', 4, 5]));
