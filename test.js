@@ -1,48 +1,53 @@
-function transform(arr) {
-function isContrl(str) {
-  if (str != `--discard-next` && str != `--discard-prev` && str != `--double-next` && str != `--double-prev`) return str;
-}
 
-if (Array.isArray(arr) != true)
-  throw new Error(`'arr' parameter must be an instance of the Array!`);
+let chainMaker = {
+    chain: [],
 
-let arrnew = [...arr];
-let flag = false,
-  isdel = false;
+    getLength() {
+        return this.chain.length;
+    },
 
-  
-let i = arr.indexOf(`--discard-next`);
-if (i != -1 && arr[i + 1] != undefined) {
-  flag = true;
-  isdel = true;
-  arrnew = arrnew.slice(0, i).concat(arrnew.slice(i + 2))
- };
- console.log(arrnew);
+    addLink(value) {
+        if (arguments.length === 0) this.chain.push(`( )`);
+        else this.chain.push(`( ${value} )`);
+        return this;
+    },
 
-i = arr.indexOf(`--discard-prev`);
-if (i != -1 && arr[i - 1] != undefined && isdel == false) {
-  flag = true;
-  arrnew = arrnew.slice(0, i - 1).concat(arrnew.slice(i + 1));
- };
- console.log(arrnew);
+    removeLink(position ) {
+       if (typeof position !== 'number' ||  position > this.chain.length || position <= 0 || (position ^ 0) !== position ) {
+          
+        throw new Error (`You can't remove incorrect link!`);
+       }
+       this.chain.splice(position-1,1);
+       return this;
+    },
 
-i = arr.indexOf(`--double-next`);
-if (i != -1 && arr[i + 1] != undefined && isdel == false) {
-  flag = true;
-  arrnew = arrnew.slice(0, i).concat(arrnew[i + 1]).concat(arrnew.slice(i + 1));
- };
-console.log(arrnew);
+    reverseChain() {
+        this.chain.reverse();
+        return this;
+    },
 
-i = arr.indexOf(`--double-prev`);
-if (i != -1 && arr[i - 1] != undefined && isdel == false) {
-  flag = true;
-  arrnew = arrnew.slice(0, i).concat(arrnew[i - 1]).concat(arrnew.slice(i + 1));
- };
- console.log(arrnew);
+    finishChain() {
+        let oldchain = this.chain.join('~~');
+        this.chain = [];
+        return oldchain;
+    }
+};
 
-if (flag == false)  arrnew = [...arr];
 
-return arrnew.filter(isContrl);
-}
+// console.log (chainMaker.getLength());
+//console.log(chainMaker.addLink('1'));
+//console.log(chainMaker.addLink());
+//console.log(chainMaker.addLink('3'));
+// console.log (chainMaker.getLength());
+//console.log(chainMaker.finishChain());
+//console.log(chainMaker.reverseChain());
+//console.log(chainMaker.finishChain());
+console.log(chainMaker.addLink(1).addLink(2).addLink(3).removeLink(4));
 
-console.log(transform([1, 2, 3, '--double-next', 1337, '--discard-prev', 4, 5]));
+chainMaker.addLink(1);
+chainMaker.addLink(2);
+chainMaker.reverseChain();
+chainMaker.addLink(3);
+console.log(chainMaker.finishChain());
+chainMaker.removeLink(0);
+console.log(chainMaker.finishChain());
